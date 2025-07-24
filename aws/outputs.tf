@@ -1,19 +1,13 @@
-# output "instance_id" {
-#   description = "ID of the EC instance"
-#   value       = aws_instance.this.id
-# }
+output "vpc_id" {
+  value = data.aws_vpc.selected.id
+}
 
-# output "instance_public_ip" {
-#   description = "Public IP address of EC2 instance"
-#   value       = aws_instance.this.public_ip
-# }
+output "public_ip" {
+  description = "public ip of ec2"
+  value       = aws_instance.this.public_ip
+}
 
 # output "elastic_ip" {
 #   description = "Elastic IP for instance"
 #   value       = aws_eip.this.public_ip
-# }
-
-# output "instance_public_url_eip" {
-#   description = "Public URL address of EC2 instance"
-#   value       = aws_eip.this.public_dns
 # }

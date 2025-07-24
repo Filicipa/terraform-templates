@@ -23,7 +23,7 @@ data "aws_availability_zones" "available" {
 data "aws_vpc" "selected" {
   filter {
     name   = "tag:Name"
-    values = ["compaund-vpc"]
+    values = [var.vpc_name]
   }
 }
 

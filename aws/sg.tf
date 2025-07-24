@@ -1,6 +1,5 @@
 resource "aws_security_group" "this" {
-  # description = "Security Group for instance"
-  name   = "${var.project_name}-${var.env}-${var.instance_name}"
+  name   = "${var.project_name}-${var.env}-${var.instance_name}-sg"
   vpc_id = data.aws_vpc.selected.id
 
   lifecycle {
@@ -8,73 +7,47 @@ resource "aws_security_group" "this" {
   }
 
   tags = {
-    Name        = "${var.project_name}-${var.env}-sg"
-    Project     = var.project_name,
+    Name        = "${var.project_name}-${var.env}-${var.instance_name}-sg"
+    Project     = var.project_name
     Environment = var.env
     Terraform   = true
   }
 }
 
-resource "aws_security_group_rule" "access_tcp_from_internet" {
+resource "aws_vpc_security_group_ingress_rule" "tcp_ports" {
+  count             = length(var.tcp_ports)
+  from_port         = element(var.tcp_ports, count.index)
+  to_port           = element(var.tcp_ports, count.index)
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
   security_group_id = aws_security_group.this.id
-  type              = "ingress"
-  count             = length(var.allow_tcp_ports)
-  from_port         = element(var.allow_tcp_ports, count.index)
-  to_port           = element(var.allow_tcp_ports, count.index)
-  description       = "Allow from internet to tcp port ${element(var.allow_tcp_ports, count.index)}"
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow TCP port"
 }
 
-resource "aws_security_group_rule" "access_udp_from_internet" {
+resource "aws_vpc_security_group_ingress_rule" "udp_ports" {
+  count             = length(var.udp_ports)
+  from_port         = element(var.udp_ports, count.index)
+  to_port           = element(var.udp_ports, count.index)
+  ip_protocol       = "udp"
+  cidr_ipv4         = "0.0.0.0/0"
   security_group_id = aws_security_group.this.id
-  type              = "ingress"
-  count             = length(var.allow_udp_ports)
-  from_port         = element(var.allow_udp_ports, count.index)
-  to_port           = element(var.allow_udp_ports, count.index)
-  description       = "Allow from internet to udp port ${element(var.allow_udp_ports, count.index)}"
-  protocol          = "udp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow UDP port"
 }
 
-resource "aws_security_group_rule" "access_tcp_range_from_internet" {
-  security_group_id = aws_security_group.this.id
-  type              = "ingress"
-  count             = length(var.start_tcp_ports)
-  from_port         = element(var.start_tcp_ports, count.index)
-  to_port           = element(var.end_tcp_ports, count.index)
-  description       = "Allow from internet to tcp port range"
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
-resource "aws_security_group_rule" "access_udp_range_from_internet" {
-  security_group_id = aws_security_group.this.id
-  type              = "ingress"
-  count             = length(var.start_udp_ports)
-  from_port         = element(var.start_udp_ports, count.index)
-  to_port           = element(var.end_udp_ports, count.index)
-  description       = "Allow from internet to tcp port range"
-  protocol          = "udp"
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
-resource "aws_security_group_rule" "access_from_vpc" {
+resource "aws_vpc_security_group_ingress_rule" "access_from_vpc" {
   security_group_id = aws_security_group.this.id
   description       = "Allow connecting from VPC"
-  type              = "ingress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "all"
-  cidr_blocks       = [data.aws_vpc.selected.cidr_block]
+  from_port         = -1
+  to_port           = -1
+  ip_protocol       = "all"
+  cidr_ipv4         = data.aws_vpc.selected.cidr_block
 }
 
-resource "aws_security_group_rule" "access_to_anywhere" {
+resource "aws_vpc_security_group_egress_rule" "access_to_anywhere" {
   security_group_id = aws_security_group.this.id
   description       = "Allow outbound traffic"
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "all"
-  cidr_blocks       = ["0.0.0.0/0"]
+  from_port         = -1
+  to_port           = -1
+  ip_protocol       = "all"
+  cidr_ipv4         = "0.0.0.0/0"
 }

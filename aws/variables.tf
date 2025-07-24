@@ -1,5 +1,20 @@
 variable "region" {}
 
+variable "vpc_name" {}
+
+variable "project_name" {
+  description = "Project name"
+  validation {
+    condition     = length(var.project_name) > 3
+    error_message = "The project_name value must be set and more than 3 symbols."
+  }
+}
+
+variable "env" {
+  description = "env"
+  type        = string
+}
+
 variable "ssh_key" {
   description = "SSH key pair for instance"
   type        = string
@@ -37,51 +52,32 @@ variable "instance_profile" {
   default = null
 }
 
-variable "allow_tcp_ports" {
-  description = "List of ports to open for server"
-  type        = list(string)
+variable "tcp_ports" {
+  type        = list(number)
+  default     = []
+  description = "List of TCP ports to open (single ports)"
 }
 
-variable "allow_udp_ports" {
-  description = "List of ports to open for server"
-  type        = list(string)
-  default     = [""]
+variable "udp_ports" {
+  type        = list(number)
+  default     = []
+  description = "List of UDP ports to open (single ports)"
 }
 
-variable "start_tcp_ports" {
-  description = "List of ports to open for server"
-  type        = list(string)
-  default     = [""]
+variable "tcp_port_ranges" {
+  type = list(object({
+    from = number
+    to   = number
+  }))
+  default     = []
+  description = "List of TCP port ranges"
 }
 
-variable "end_tcp_ports" {
-  description = "List of ports to open for server"
-  type        = list(string)
-  default     = [""]
+variable "udp_port_ranges" {
+  type = list(object({
+    from = number
+    to   = number
+  }))
+  default     = []
+  description = "List of UDP port ranges"
 }
-
-variable "start_udp_ports" {
-  description = "List of ports to open for server"
-  type        = list(string)
-  default     = [""]
-}
-
-variable "end_udp_ports" {
-  description = "List of ports to open for server"
-  type        = list(string)
-  default     = [""]
-}
-
-variable "project_name" {
-  description = "Project name"
-  validation {
-    condition     = length(var.project_name) > 3
-    error_message = "The project_name value must be set and more than 3 symbols."
-  }
-}
-
-variable "env" {
-  description = "env"
-  type        = string
-}
-
