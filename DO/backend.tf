@@ -6,7 +6,7 @@ resource "digitalocean_droplet" "backend" {
   size     = "s-2vcpu-2gb"
   ssh_keys = ["44:32:19:71:ac:49:c2:c7:c8:45:e7:bd:46:a5:6e:8a"]
   backups  = false
-  vpc_uuid = digitalocean_vpc.pepestein-network.id
+  vpc_uuid = digitalocean_vpc.network.id
   # backup_policy {
   #   plan    = "weekly"
   #   weekday = "TUE"
@@ -40,12 +40,12 @@ resource "digitalocean_firewall" "backend" {
   inbound_rule {
     protocol         = "tcp"
     port_range       = "all"
-    source_addresses = ["10.114.0.0/20"]
+    source_addresses = [var.ip_range]
   }
   inbound_rule {
     protocol         = "udp"
     port_range       = "all"
-    source_addresses = ["10.114.0.0/20"]
+    source_addresses = [var.ip_range]
   }
   outbound_rule {
     protocol              = "icmp"

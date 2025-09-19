@@ -13,7 +13,7 @@ resource "digitalocean_database_firewall" "postgres" {
 
   # rule {
   #   type  = "ip_addr"
-  #   value = "10.114.0.0/20"
+  #   value = var.ip_range
   # }
   rule {
     type  = "droplet"
